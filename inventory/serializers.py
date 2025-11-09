@@ -1,3 +1,4 @@
+
 from rest_framework import serializers
 from .models import (
     Category, Product, Supplier, Customer,
@@ -6,65 +7,128 @@ from .models import (
     StockMovement, AuditLog
 )
 
+# ===============================
+# CATEGORY
+# ===============================
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
 
 
+# ===============================
+# PRODUCT
+# ===============================
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
 
 
+# ===============================
+# SUPPLIER
+# ===============================
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
         fields = "__all__"
 
 
+# ===============================
+# CUSTOMER
+# ===============================
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = "__all__"
 
 
-class PurchaseItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PurchaseItem
-        fields = "__all__"
-
-
+# ===============================
+# PURCHASE ORDER
+# ===============================
 class PurchaseOrderSerializer(serializers.ModelSerializer):
-    items = PurchaseItemSerializer(many=True, read_only=True)
+    supplier_name = serializers.CharField(source="supplier.name", read_only=True)
 
     class Meta:
         model = PurchaseOrder
         fields = "__all__"
 
 
+# ===============================
+# PURCHASE ITEM
+# ===============================
+class PurchaseItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source="product.name", read_only=True)
+    purchase_order_id = serializers.IntegerField(source="purchase_order.id", read_only=True)
+    purchase_order_display = serializers.CharField(source="purchase_order.__str__", read_only=True)
+
+    class Meta:
+        model = PurchaseItem
+        fields = "__all__"
+# ==============================
+# SALES ITEM
+# ==============================
+
 class SalesItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source="product.name", read_only=True)
+    sales_order_display = serializers.SerializerMethodField()
+
     class Meta:
         model = SalesItem
-        fields = "__all__"
+        fields = [
+            "id",
+            "product_name",
+            "sales_order_id",
+            "sales_order_display",
+            "quantity",
+            "selling_price",
+            "sales_order",
+            "product",
+        ]
+
+    def get_sales_order_display(self, obj):
+        return f"SO-{obj.sales_order.id}" if obj.sales_order else "N/A"
+
 
 
 class SalesOrderSerializer(serializers.ModelSerializer):
-    items = SalesItemSerializer(many=True, read_only=True)
+    customer_name = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = SalesOrder
-        fields = "__all__"
+        fields = [
+            "id",
+            "customer",
+            "customer_name",
+            "order_date",
+            "total_amount",
+            "status",
+            "processed_by",
+            
+        ]
+
+    def get_customer_name(self, obj):
+        if obj.customer:
+            return getattr(obj.customer, "name", "N/A")
+        return "N/A"
 
 
+# ===============================
+# STOCK MOVEMENT
+# ===============================
 class StockMovementSerializer(serializers.ModelSerializer):
+    product = serializers.CharField(source="product.name", read_only=True)
     class Meta:
         model = StockMovement
         fields = "__all__"
 
-
+# ===============================
+# AUDIT LOG
+# ===============================
 class AuditLogSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.username', read_only=True)
+
     class Meta:
         model = AuditLog
         fields = "__all__"

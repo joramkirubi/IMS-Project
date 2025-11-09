@@ -1,37 +1,43 @@
-import { Routes, Route, Link } from "react-router-dom";
-import Products from "./pages/Products";
-import "./index.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
 
-function Home() {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">IMS Home</h1>
-      <p className="mt-2">Quick links:</p>
-      <div className="mt-4 space-x-2">
-        <Link to="/products" className="px-3 py-2 bg-blue-600 text-white rounded">
-          Products
-        </Link>
-      </div>
-    </div>
-  );
-}
+// Import your pages
+import Dashboard from "./pages/Dashboard";
+import AuditLogs from "./pages/AuditLogs";
+import Categories from "./pages/Categories";
+import Customers from "./pages/Customers";
+import Products from "./pages/Products";
+import PurchaseItems from "./pages/PurchaseItems";
+import PurchaseOrders from "./pages/PurchaseOrders";
+import SalesItems from "./pages/SalesItems";
+import SalesOrders from "./pages/SalesOrders";
+import StockMovements from "./pages/StockMovements";
+import Suppliers from "./pages/Suppliers";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto p-4">
-          <h2 className="text-lg font-semibold">Shepherd IMS (Dev)</h2>
-        </div>
-      </header>
+    
+      <div className="min-h-screen bg-gray-100">
+        {/* Fixed Sidebar */}
+        <Sidebar />
 
-      <main className="max-w-6xl mx-auto p-4">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-        </Routes>
-      </main>
-    </div>
+        {/* Main content */}
+        <main className="flex-1 ml-64 p-8 text-gray-900">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/audit-logs" element={<AuditLogs />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/purchase-items" element={<PurchaseItems />} />
+            <Route path="/purchase-orders" element={<PurchaseOrders />} />
+            <Route path="/sales-items" element={<SalesItems />} />
+            <Route path="/sales-orders" element={<SalesOrders />} />
+            <Route path="/stock-movements" element={<StockMovements />} />
+            <Route path="/suppliers" element={<Suppliers />} />
+          </Routes>
+        </main>
+      </div>
+    
   );
 }
-
