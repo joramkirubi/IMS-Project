@@ -2,23 +2,64 @@ import { useState } from "react";
 import useFetchData from "../hooks/useFetchData";
 import DataTable from "../components/DataTable";
 import AddCustomerForm from "../components/AddCustomerForm";
+import api from "../api/axios";
 
 export default function Customers() {
   const [showForm, setShowForm] = useState(false);
-  const { data, loading, error } = useFetchData("http://127.0.0.1:8000/api/customers/");
-  const refresh = () => window.location.reload();
+  const [editingCustomer, setEditingCustomer] = useState(null);
+
+  const { data, loading, error } = useFetchData("customers/");
+
+  const refreshPage = () => window.location.reload();
+
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this customer?")) return;
+    try {
+      await api.delete(`customers/${id}/`);
+      alert("Deleted!");
+      refreshPage();
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
+    }
+  };
+
+  const handleEdit = (customer) => {
+    setEditingCustomer(customer);
+    setShowForm(true);
+  };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Customers</h1>
-        <button onClick={() => setShowForm(true)} className="px-3 py-2 bg-blue-600 text-white rounded">+ Add Customer</button>
+        <button
+          onClick={() => {
+            setEditingCustomer(null);
+            setShowForm(true);
+          }}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          + Add Customer
+        </button>
       </div>
 
-      <DataTable title="Customers" data={data} loading={loading} error={error} />
+      <DataTable
+        title="Customers"
+        data={data}
+        loading={loading}
+        error={error}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
-      {showForm && <AddCustomerForm onClose={() => setShowForm(false)} onSuccess={refresh} />}
+      {showForm && (
+        <AddCustomerForm
+          onClose={() => setShowForm(false)}
+          onSuccess={refreshPage}
+          editingCustomer={editingCustomer}
+        />
+      )}
     </div>
   );
 }
-

@@ -5,7 +5,8 @@ import AddAuditLogForm from "../components/AddAuditLogForm";
 
 export default function AuditLogs() {
   const [showForm, setShowForm] = useState(false);
-  const { data, loading, error } = useFetchData("http://127.0.0.1:8000/api/audit-logs/");
+  // Poll audit logs every 5 seconds so frontend updates elsewhere show up quickly
+  const { data, loading, error } = useFetchData("http://127.0.0.1:8000/api/audit-logs/", { pollInterval: 5000 });
   const refresh = () => window.location.reload();
 
   return (

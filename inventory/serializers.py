@@ -20,6 +20,8 @@ class CategorySerializer(serializers.ModelSerializer):
 # PRODUCT
 # ===============================
 class ProductSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source="category.name", read_only=True)
+
     class Meta:
         model = Product
         fields = "__all__"
@@ -59,7 +61,6 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
 # ===============================
 class PurchaseItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source="product.name", read_only=True)
-    purchase_order_id = serializers.IntegerField(source="purchase_order.id", read_only=True)
     purchase_order_display = serializers.CharField(source="purchase_order.__str__", read_only=True)
 
     class Meta:
@@ -75,16 +76,7 @@ class SalesItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SalesItem
-        fields = [
-            "id",
-            "product_name",
-            "sales_order_id",
-            "sales_order_display",
-            "quantity",
-            "selling_price",
-            "sales_order",
-            "product",
-        ]
+        fields = "__all__"
 
     def get_sales_order_display(self, obj):
         return f"SO-{obj.sales_order.id}" if obj.sales_order else "N/A"
@@ -93,20 +85,11 @@ class SalesItemSerializer(serializers.ModelSerializer):
 
 class SalesOrderSerializer(serializers.ModelSerializer):
     customer_name = serializers.SerializerMethodField()
-    
+    processed_by_name = serializers.CharField(source="processed_by.username", read_only=True, allow_null=True)
 
     class Meta:
         model = SalesOrder
-        fields = [
-            "id",
-            "customer",
-            "customer_name",
-            "order_date",
-            "total_amount",
-            "status",
-            "processed_by",
-            
-        ]
+        fields = "__all__"
 
     def get_customer_name(self, obj):
         if obj.customer:
@@ -118,7 +101,8 @@ class SalesOrderSerializer(serializers.ModelSerializer):
 # STOCK MOVEMENT
 # ===============================
 class StockMovementSerializer(serializers.ModelSerializer):
-    product = serializers.CharField(source="product.name", read_only=True)
+    product_name = serializers.CharField(source="product.name", read_only=True)
+
     class Meta:
         model = StockMovement
         fields = "__all__"
@@ -127,7 +111,7 @@ class StockMovementSerializer(serializers.ModelSerializer):
 # AUDIT LOG
 # ===============================
 class AuditLogSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(source='user.username', read_only=True)
+    user_name = serializers.CharField(source="user.username", read_only=True, allow_null=True)
 
     class Meta:
         model = AuditLog

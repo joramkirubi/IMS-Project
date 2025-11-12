@@ -1,0 +1,9 @@
+Django==5.2.7
+djangorestframework
+django-cors-headers
+python-dotenv
+djangorestframework-simplejwt
+psycopg2-binary
+
+# Frontend dev (if using Node locally)
+# Node.js and npm are required; dependencies declared in frontend/package.json

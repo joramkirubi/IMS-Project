@@ -10,7 +10,7 @@ import {
   ArrowLeftRight,
   Building2,
 } from "lucide-react";
-import logo from "../assets/shepherd_logo.png";
+import logo from "../assets/p_logo.jpg";
 
 
 export default function Sidebar() {
@@ -33,17 +33,20 @@ export default function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 w-64 h-screen bg-gray-900 text-gray-100 flex flex-col shadow-lg">
 
-      <div className="p-6 border-b border-gray-800 flex items-center">
+      <div className="p-6 border-b border-gray-800 flex items-center gap-5">
   <img
     src={logo}
     alt="Shepherd Logo"
-    className="w-12 h-12 mr-3 object-contain"
+    className="w-20 h-20 rounded-full object-contain bg-white p-2 shadow-md"
   />
-  <div>
-    <h1 className="text-2xl font-bold text-white">Shepherd IMS</h1>
-    <p className="text-sm text-gray-400">Inventory System</p>
+  <div className="leading-snug">
+    <h1 className="text-1xl font-bold text-white">Shepherd IMS</h1>
+    <p className="text-base text-gray-300">Inventory System</p>
   </div>
 </div>
+
+
+
 
 
 

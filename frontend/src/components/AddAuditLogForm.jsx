@@ -25,21 +25,21 @@ export default function AddAuditLogForm({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white w-96 p-6 rounded shadow-lg">
-        <h3 className="text-lg font-semibold mb-3">Add Audit Log</h3>
-        <form className="space-y-2" onSubmit={handleSubmit}>
-          <input name="action" onChange={handleChange} placeholder="Action" className="w-full border p-2 rounded" required />
-          <input name="description" onChange={handleChange} placeholder="Description" className="w-full border p-2 rounded" />
-          <select name="user" onChange={handleChange} className="w-full border p-2 rounded">
+    <div className="fixed inset-0 bg-gray-50 z-50 flex items-center justify-center">
+      <div className="bg-white w-96 p-6 rounded-lg shadow-lg">
+        <h3 className="text-2xl font-bold mb-6 text-gray-800">Add Audit Log</h3>
+        <form className="space-y-3" onSubmit={handleSubmit}>
+          <input name="action" onChange={handleChange} placeholder="Action" className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
+          <input name="description" onChange={handleChange} placeholder="Description" className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+          <select name="user" onChange={handleChange} className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
             <option value="">Select user (optional)</option>
             {auditEntries.map(a => a.user && <option key={a.id} value={a.user}>{a.user}</option>)}
           </select>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-3 py-1 bg-gray-300 rounded">Cancel</button>
-            <button type="submit" disabled={loading} className="px-3 py-1 bg-blue-600 text-white rounded">{loading ? "Saving..." : "Save"}</button>
+          <div className="flex justify-end gap-2 pt-4">
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+            <button type="submit" disabled={loading} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50">{loading ? "Saving..." : "Save"}</button>
           </div>
         </form>
       </div>
