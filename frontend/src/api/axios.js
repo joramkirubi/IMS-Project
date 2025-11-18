@@ -4,66 +4,105 @@ import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
 
 const api = axios.create({
-  baseURL: API_BASE + "/api/", // points to /api/ endpoints
+  baseURL: API_BASE + "/api/",
   headers: {
     "Content-Type": "application/json",
   },
-  // withCredentials: true, // enable if you use cookies (we're using token/localStorage for dev)
 });
 
-// Simple token helpers (dev). We'll use them later for auth.
-const ACCESS_KEY = "ims_access";
-const REFRESH_KEY = "ims_refresh";
+// Use a single `tokens` JSON entry so it matches AuthProvider
+const TOKENS_KEY = "tokens";
 
+// Helpers
 export function setTokens({ access, refresh }) {
-  localStorage.setItem(ACCESS_KEY, access);
-  if (refresh) localStorage.setItem(REFRESH_KEY, refresh);
-}
-export function getAccessToken() {
-  return localStorage.getItem(ACCESS_KEY);
-}
-export function getRefreshToken() {
-  return localStorage.getItem(REFRESH_KEY);
-}
-export function clearTokens() {
-  localStorage.removeItem(ACCESS_KEY);
-  localStorage.removeItem(REFRESH_KEY);
+  const current = (() => {
+    try {
+      return JSON.parse(localStorage.getItem(TOKENS_KEY)) || {};
+    } catch {
+      return {};
+    }
+  })();
+
+  const updated = {
+    ...current,
+    ...(access ? { access } : {}),
+    ...(refresh ? { refresh } : {}),
+  };
+
+  localStorage.setItem(TOKENS_KEY, JSON.stringify(updated));
 }
 
-// attach Authorization header if token present
+export function getAccessToken() {
+  try {
+    const t = JSON.parse(localStorage.getItem(TOKENS_KEY));
+    return t?.access || null;
+  } catch {
+    return null;
+  }
+}
+
+export function getRefreshToken() {
+  try {
+    const t = JSON.parse(localStorage.getItem(TOKENS_KEY));
+    return t?.refresh || null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearTokens() {
+  localStorage.removeItem(TOKENS_KEY);
+}
+
+// ----------------------------
+// 1️⃣ Add access token to requests
+// ----------------------------
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// optionally: auto-refresh on 401 (basic)
+// ----------------------------
+// 2️⃣ Auto-refresh expired access token
+// ----------------------------
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const original = err.config;
+
+    // If 401 -> try refresh once
     if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
+
       const refresh = getRefreshToken();
       if (!refresh) {
         clearTokens();
+        window.location.href = "/login";
         return Promise.reject(err);
       }
+
       try {
-        const r = await axios.post(`${API_BASE}/api/token/refresh/`, {
+        const r = await axios.post(`${API_BASE}/api/auth/token/refresh/`, {
           refresh,
         });
+
+        // Store new token
         setTokens({ access: r.data.access, refresh });
+
+        // Retry request with new access token
         original.headers.Authorization = `Bearer ${r.data.access}`;
         return axios(original);
       } catch (e) {
+        // Refresh failed → logout user
         clearTokens();
+        window.location.href = "/login";
         return Promise.reject(e);
       }
     }
+
     return Promise.reject(err);
   }
 );
 
 export default api;
-

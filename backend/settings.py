@@ -7,6 +7,7 @@ See https://docs.djangoproject.com/ for full settings reference.
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -123,10 +124,23 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DATETIME_FORMAT': '%b %d, %Y, %I:%M %p',  
+    'DATETIME_FORMAT': '%b %d, %Y, %I:%M %p',
+
+    'DEFAULT_PERMISSION_CLASSES': (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
 }
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  
 ]
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
 
